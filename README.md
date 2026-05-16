@@ -48,3 +48,8 @@ docker run --env-file .env -p 8000:8000 cve-analyzer:latest
 ## Notes
 - Do not commit secrets. Use `.env` for local testing and CI secrets for pipelines.
 - This prototype proxies the SBOM to a configured LLM; refine prompts and parsing for production use.
+
+### Mock LLM mode
+- For demos or offline testing you can enable a built-in mock LLM response by setting `MOCK_LLM=true` in your `.env` (or pass `-e MOCK_LLM=true` to `docker run`).
+- When enabled, the service returns a canned analysis without calling any external APIs.
+

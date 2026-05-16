@@ -82,13 +82,45 @@ def make_ssl_context():
 
 
 async def call_llm_with_retry(prompt: str):
+    # If MOCK_LLM is enabled, return a deterministic mock response for demos/tests
+    mock_flag = os.getenv("MOCK_LLM", "false").lower()
+    if mock_flag in ("1", "true", "yes"):
+        text = (
+            "Mock analysis summary: This is a demo response.\n\n"
+            "- Recommendation: Update base image to latest patched version.\n"
+            "- Recommendation: Run `npm audit` / `pip-audit` and remediate high severity findings.\n"
+            "- Recommendation: Verify transitive dependency tree and apply pinned versions.\n"
+        )
+        return {"output": text, "choices": [{"text": text}]}
     # Support multiple env names for compatibility with various gateways
     api_url = os.getenv("GATEWAY_BASE_URL") or os.getenv("LLM_API_URL")
     api_key = os.getenv("GATEWAY_API_KEY") or os.getenv("LLM_API_KEY")
     model = os.getenv("MODEL") or "gpt-4.1"
 
-    if not api_url or not api_key:
-        raise HTTPException(status_code=500, detail="LLM API config missing")
+        # If MOCK_LLM is enabled, return a deterministic mock response for demos/tests
+        mock_flag = os.getenv("MOCK_LLM", "false").lower()
+        if mock_flag in ("1", "true", "yes"):
+            text = (
+                "Mock analysis summary: This is a demo response.\n\n"
+                "- Recommendation: Update base image to latest patched version.\n"
+                "- Recommendation: Run `npm audit` / `pip-audit` and remediate high severity findings.\n"
+                "- Recommendation: Verify transitive dependency tree and apply pinned versions.\n"
+            )
+            return {"output": text, "choices": [{"text": text}]}
+
+        # Support multiple env names for compatibility with various gateways
+        api_url = os.getenv("GATEWAY_BASE_URL") or os.getenv("LLM_API_URL")
+        api_key = os.getenv("GATEWAY_API_KEY") or os.getenv("LLM_API_KEY")
+        model = os.getenv("MODEL") or "gpt-4.1"
+
+        # If gateway credentials are missing, fall back to mock mode instead of failing
+        if not api_url or not api_key:
+            text = (
+                "Mock analysis summary: No gateway configured — running in offline demo mode.\n\n"
+                "- Recommendation: Enable gateway credentials for real LLM results.\n"
+                "- Recommendation: Update base image to latest patched version.\n"
+            )
+            return {"output": text, "choices": [{"text": text}]}
 
     ssl_ctx = make_ssl_context()
     async with httpx.AsyncClient(verify=ssl_ctx, timeout=30.0) as client:
