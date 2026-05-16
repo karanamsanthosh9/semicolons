@@ -1,0 +1,8 @@
+DEMO VIDEO PLACEHOLDER
+
+This repository includes a placeholder for the demo video. Replace this file with an actual MP4 recording named `demo.mp4` in this folder.
+
+Suggested recording steps:
+1. Start the service locally: `uvicorn app.main:app --port 8000`.
+2. Show uploading an SBOM to `http://localhost:8000/analyze` using `curl` or the UI.
+3. Demonstrate the LLM-driven analysis and remediation suggestions.
